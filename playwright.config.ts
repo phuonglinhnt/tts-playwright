@@ -21,6 +21,7 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
+  //test 
 
   // Tự động khởi động website Tiệm Nhà Test khi chạy test
   webServer: {
