@@ -1,0 +1,346 @@
+{
+  "info": {
+    "name": "7 Bước Luồng Đặt Hàng - Tiệm Nhà Test",
+    "description": "Bộ 7 API test luồng theo yêu cầu:\n1. POST /auth/login\n2. GET /products?sort=price_asc\n3. POST /cart/items\n4. PATCH /cart/items/1\n5. POST /orders\n6. GET /orders/{id}\n7. PATCH /orders/{id}/status",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Bước 1: POST /auth/login (Lấy & lưu token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Lấy và lưu token vào biến', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.token).to.be.a('string');",
+              "    pm.collectionVariables.set('token', jsonData.token);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"an@test.com\",\n  \"password\": \"Matkhau123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Bước 2: GET /products?sort=price_asc",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Kiểm tra giá tăng dần', function () {",
+              "    var products = pm.response.json();",
+              "    for (var i = 0; i < products.length - 1; i++) {",
+              "        pm.expect(products[i].price).to.be.at.most(products[i + 1].price);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products?sort=price_asc",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"],
+          "query": [
+            {
+              "key": "sort",
+              "value": "price_asc"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Bước 3: POST /cart/items",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 201 hoặc 200', function () {",
+              "    pm.expect([200, 201]).to.include(pm.response.code);",
+              "});",
+              "pm.test('Kiểm tra subtotal, discount, total', function () {",
+              "    var cart = pm.response.json();",
+              "    pm.expect(cart).to.have.property('subtotal');",
+              "    pm.expect(cart).to.have.property('discount');",
+              "    pm.expect(cart).to.have.property('total');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cart/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "items"]
+        }
+      }
+    },
+    {
+      "name": "Bước 4: PATCH /cart/items/1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Kiểm tra tổng tiền mới', function () {",
+              "    var cart = pm.response.json();",
+              "    pm.expect(cart.total).to.be.a('number');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 3\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/cart/items/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["cart", "items", "1"]
+        }
+      }
+    },
+    {
+      "name": "Bước 5: POST /orders (Lưu mã đơn id)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Lưu mã đơn orderId', function () {",
+              "    var order = pm.response.json();",
+              "    pm.expect(order.id).to.be.ok;",
+              "    pm.collectionVariables.set('orderId', String(order.id));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullname\": \"Nguyễn Văn An\",\n  \"phone\": \"0901234567\",\n  \"address\": \"12 Nguyễn Huệ, Quận 1, TP HCM\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders"]
+        }
+      }
+    },
+    {
+      "name": "Bước 6: GET /orders/{id}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Đơn hàng khớp giỏ hàng', function () {",
+              "    var order = pm.response.json();",
+              "    pm.expect(order.items.length).to.be.above(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}"]
+        }
+      }
+    },
+    {
+      "name": "Bước 7: PATCH /orders/{id}/status",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code là 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Trạng thái đã chuyển sang CANCELLED', function () {",
+              "    var order = pm.response.json();",
+              "    pm.expect(order.status).to.eql('CANCELLED');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"CANCELLED\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/orders/{{orderId}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["orders", "{{orderId}}", "status"]
+        }
+      }
+    }
+  ]
+}
