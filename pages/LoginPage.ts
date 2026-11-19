@@ -21,7 +21,7 @@ export class LoginPage {
     async goto() {
         await this.page.goto('http://localhost:4000/login');
     }
-    // Hành động đăng nhập gom chung
+    // Hành động đăng nhập
     async login(email: string, password: string) {
         await this.email.fill(email);
         await this.password.fill(password);
