@@ -1,7 +1,7 @@
 import { test, expect, request } from "@playwright/test";
-import { createdOrder, getToken } from "./callBackApi";
+import { createdOrder, getAdminToken, getToken } from "./callBackApi";
 
-test.describe("Bộ kiểm thử API theo Colection", () => {
+test.describe("Bộ kiểm thử API theo Collection", () => {
   test.describe.configure({ mode: "serial" });
   test.beforeEach(async ({ request }) => {
     await request.post("/api/test/reset");
@@ -71,7 +71,74 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(orderDetail.id).toBe(newOrder.id);
   });
 
-  test("TC09 - Xem giỏ hàng hợp lệ khi có Token", async ({ request }) => {
+  test("TC09 [BUG-64] - Tạo đơn hàng với SĐT không hợp lệ ('123') phải báo lỗi 400", async ({
+    request,
+  }) => {
+    test.info().annotations.push({
+      type: "issue",
+      description:
+        "Jira: BUG-64 - API tạo đơn chấp nhận SĐT '123' không đúng định dạng 10 chữ số",
+    });
+    test.fail(
+      true,
+      "Bug-64: API trả về 201 Created thay vì 400 khi SĐT sai quy định",
+    );
+    const token = await getToken(request);
+
+    await request.post("/api/cart/items", {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { productId: 1, quantity: 1 },
+    });
+
+    const res = await request.post("/api/orders", {
+      headers: { Authorization: `Bearer ${token}` },
+      data: {
+        fullname: "Nguyen Van An",
+        phone: "123",
+        address: "Cau Giay, Ha Noi",
+      },
+    });
+    // Mong đợi: 400 Bad Request
+    // Thực tế trả về: 201 Created
+    expect(res.status()).toBe(400);
+  });
+
+  test("TC10 [BUG-65] - Khách không được phép hủy đơn hàng khi đã DELIVERED", async ({
+    request,
+  }) => {
+    test.info().annotations.push({
+      type: "issue",
+      description:
+        "Jira: BUG-65 - API trả về 200 OK thay vì 400 khi khách hủy đơn đã giao (DELIVERED)",
+    });
+    test.fail(true, "Bug-65: Backend cho phép hủy đơn khi đã giao hàng");
+    const token = await getToken(request);
+    const order = await createdOrder(request, token, 1, 1);
+
+    const adminToken = getAdminToken(request);
+    await request.patch(`/api/orders/${order.id}/status`, {
+      headers: { Authorization: `Bearer ${adminToken}` },
+      data: { status: "CONFIRMED" },
+    });
+    await request.patch(`/api/orders/${order.id}/status`, {
+      headers: { Authorization: `Bearer ${adminToken}` },
+      data: { status: "SHIPPING" },
+    });
+    await request.patch(`/api/orders/${order.id}/status`, {
+      headers: { Authorization: `Bearer ${adminToken}` },
+      data: { status: "DELIVERED" },
+    });
+    // Khách gửi yêu cầu hủy đơn đã giao
+    const resCancel = await request.patch(`/api/orders/${order.id}/status`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { status: "CANCELLED" },
+    });
+    // Mong đợi: 400 Bad Request
+    // Thực tế trả về: 200 OK
+    expect(resCancel.status()).toBe(400);
+  });
+
+  test("TC11 - Xem giỏ hàng hợp lệ khi có Token", async ({ request }) => {
     const token = await getToken(request);
     const res = await request.get("/api/cart", {
       headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +148,7 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(cart.items).toBeDefined();
   });
 
-  test("TC10 - Đổi số lượng sản phẩm trong giỏ hàng", async ({ request }) => {
+  test("TC12 - Đổi số lượng sản phẩm trong giỏ hàng", async ({ request }) => {
     const token = await getToken(request);
 
     await request.post("/api/cart/items", {
@@ -95,7 +162,7 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(res.status()).toBe(200);
   });
 
-  test("TC11 - Xóa một sản phẩm khỏi giỏ hàng", async ({ request }) => {
+  test("TC13 - Xóa một sản phẩm khỏi giỏ hàng", async ({ request }) => {
     const token = await getToken(request);
     await request.post("/api/cart/items", {
       headers: { Authorization: `Bearer ${token}` },
@@ -107,7 +174,7 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(res.status()).toBe(204);
   });
 
-  test("TC12 - Khách tự hủy đơn hàng mới tạo", async ({ request }) => {
+  test("TC14 - Khách tự hủy đơn hàng mới tạo", async ({ request }) => {
     const token = await getToken(request);
     const order = await createdOrder(request, token, 1, 1);
 
@@ -120,7 +187,7 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(updatedOrder.status).toBe("CANCELLED");
   });
 
-  test("TC13 - Khách thường không được phép đổi trạng thái sang SHIPPING", async ({
+  test("TC15 - Khách thường không được phép đổi trạng thái sang SHIPPING", async ({
     request,
   }) => {
     const token = await getToken(request);
@@ -132,7 +199,7 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(res.status()).toBe(403);
   });
 
-  test("TC14 - Lấy thông tin người dùng đang đăng nhập (Me)", async ({
+  test("TC16 - Lấy thông tin người dùng đang đăng nhập (Me)", async ({
     request,
   }) => {
     const token = await getToken(request);
@@ -142,5 +209,33 @@ test.describe("Bộ kiểm thử API theo Colection", () => {
     expect(res.status()).toBe(200);
     const user = await res.json();
     expect(user.email).toBe("an@test.com");
+  });
+
+  test("TC17 [BUG-66] - Cập nhật số lượng sản phẩm trong giỏ vượt quá 10 (số lượng = 15) phải báo lỗi 400", async ({
+    request,
+  }) => {
+    test.info().annotations.push({
+      type: "issue",
+      description:
+        "Jira: BUG-66 - API PATCH /api/cart/items/:id cho phép mua 15 sản phẩm (vượt tối đa 10)",
+    });
+    test.fail(
+      true,
+      "Bug-66: API trả về 200 OK thay vì 400 khi cập nhật quantity = 15",
+    );
+    const token = await getToken(request);
+
+    await request.post("/api/cart/items", {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { productId: 1, quantity: 1 },
+    });
+
+    const res = await request.patch("/api/cart/items/1", {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { quantity: 15 },
+    });
+    // Mong đợi: 400 Bad Request
+    // Kết quả trả về: 200 OK
+    expect(res.status()).toBe(400);
   });
 });
