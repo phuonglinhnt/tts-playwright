@@ -1,0 +1,423 @@
+import json
+
+collection = {
+    "info": {
+        "_postman_id": "tiem-nha-test-automated-suite-v1",
+        "name": "Tiệm Nhà Test - Automated Collection (16 Requests)",
+        "description": "Collection kiểm thử tự động đạt đầy đủ 5 tiêu chí bài tập:\n1. 16 request dùng {{baseUrl}}\n2. Mỗi request có pm.test\n3. Nối request: token và orderId lưu vào biến\n4. 6 trường hợp lỗi (Negative Test) có ghi rõ kỹ thuật\n5. Chạy mượt mà 100% xanh bằng Collection Runner",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Auth & User",
+            "item": [
+                {
+                    "name": "01. [Happy Path] POST Đăng nhập & Lưu token [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Có trả về token hợp lệ', function () {",
+                                "    const res = pm.response.json();",
+                                "    pm.expect(res.token).to.be.a('string');",
+                                "    pm.environment.set('token', res.token);",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{"key": "Content-Type", "value": "application/json"}],
+                        "body": {"mode": "raw", "raw": json.dumps({"email": "an@test.com", "password": "Matkhau123"}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"]}
+                    }
+                },
+                {
+                    "name": "02. [Lỗi 1/6] POST Đăng nhập sai mật khẩu [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 401 Unauthorized', function () {",
+                                "    pm.response.to.have.status(401);",
+                                "});",
+                                "pm.test('Thông báo lỗi đúng quy định', function () {",
+                                "    pm.expect(pm.response.json().message).to.eql('Email hoặc mật khẩu không đúng');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{"key": "Content-Type", "value": "application/json"}],
+                        "body": {"mode": "raw", "raw": json.dumps({"email": "an@test.com", "password": "SaiPassword123"}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"]}
+                    }
+                },
+                {
+                    "name": "03. [Lỗi 2/6] POST Đăng ký tuổi dưới 18 [BVA - YC-14]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 400 Bad Request', function () {",
+                                "    pm.response.to.have.status(400);",
+                                "});",
+                                "pm.test('Báo lỗi tuổi không hợp lệ', function () {",
+                                "    const res = pm.response.json();",
+                                "    pm.expect(res.errors.age).to.include('18');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{"key": "Content-Type", "value": "application/json"}],
+                        "body": {"mode": "raw", "raw": json.dumps({"name": "Nguyen Test", "email": "tuoi17@test.com", "password": "Matkhau123", "confirmPassword": "Matkhau123", "age": 17}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"]}
+                    }
+                },
+                {
+                    "name": "04. [Happy Path] GET Lấy thông tin user hiện tại (Me) [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Đúng email người dùng', function () {",
+                                "    pm.expect(pm.response.json().email).to.eql('an@test.com');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                        "url": {"raw": "{{baseUrl}}/me", "host": ["{{baseUrl}}"], "path": ["me"]}
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Products",
+            "item": [
+                {
+                    "name": "05. [Happy Path] GET Danh sách sản phẩm [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Danh sách sản phẩm là mảng có dữ liệu', function () {",
+                                "    pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty;",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                        "url": {"raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"]}
+                    }
+                },
+                {
+                    "name": "06. [Lỗi 3/6] GET Xem chi tiết sản phẩm không tồn tại [Error Guessing]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 404 Not Found', function () {",
+                                "    pm.response.to.have.status(404);",
+                                "});",
+                                "pm.test('Thông báo không tìm thấy sản phẩm', function () {",
+                                "    pm.expect(pm.response.json().message).to.eql('Không tìm thấy sản phẩm');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                        "url": {"raw": "{{baseUrl}}/products/999999", "host": ["{{baseUrl}}"], "path": ["products", "999999"]}
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Cart",
+            "item": [
+                {
+                    "name": "07. [Lỗi 4/6] GET Xem giỏ hàng không truyền Token [Error Guessing / Security]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 401 Unauthorized', function () {",
+                                "    pm.response.to.have.status(401);",
+                                "});",
+                                "pm.test('Báo cần đăng nhập', function () {",
+                                "    pm.expect(pm.response.json().message).to.eql('Bạn cần đăng nhập để thực hiện thao tác này');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {"raw": "{{baseUrl}}/cart", "host": ["{{baseUrl}}"], "path": ["cart"]}
+                    }
+                },
+                {
+                    "name": "08. [Lỗi 5/6] POST Thêm vào giỏ bỏ trống productId [Invalid EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 400 Bad Request', function () {",
+                                "    pm.response.to.have.status(400);",
+                                "});",
+                                "pm.test('Báo thiếu productId', function () {",
+                                "    pm.expect(pm.response.json().message).to.eql('Thiếu productId');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "body": {"mode": "raw", "raw": json.dumps({"quantity": 1}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/cart/items", "host": ["{{baseUrl}}"], "path": ["cart", "items"]}
+                    }
+                },
+                {
+                    "name": "09. [Happy Path] POST Thêm sản phẩm hợp lệ vào giỏ [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 201 Created', function () {",
+                                "    pm.response.to.have.status(201);",
+                                "});",
+                                "pm.test('Giỏ hàng có sản phẩm', function () {",
+                                "    pm.expect(pm.response.json().items.length).to.be.above(0);",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "body": {"mode": "raw", "raw": json.dumps({"productId": 1, "quantity": 1}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/cart/items", "host": ["{{baseUrl}}"], "path": ["cart", "items"]}
+                    }
+                },
+                {
+                    "name": "10. [Happy Path] GET Xem giỏ hàng có Token [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Giỏ hàng có subtotal hợp lệ', function () {",
+                                "    pm.expect(pm.response.json().subtotal).to.be.a('number');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                        "url": {"raw": "{{baseUrl}}/cart", "host": ["{{baseUrl}}"], "path": ["cart"]}
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Orders",
+            "item": [
+                {
+                    "name": "11. [Happy Path] POST Tạo đơn hàng & Lưu orderId [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 201 Created', function () {",
+                                "    pm.response.to.have.status(201);",
+                                "});",
+                                "pm.test('Tạo đơn thành công và lưu orderId', function () {",
+                                "    const res = pm.response.json();",
+                                "    pm.expect(res.id).to.be.a('number');",
+                                "    pm.environment.set('orderId', res.id);",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "body": {"mode": "raw", "raw": json.dumps({"fullname": "Nguyen Van An", "phone": "0901234567", "address": "123 Cau Giay, Ha Noi"}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/orders", "host": ["{{baseUrl}}"], "path": ["orders"]}
+                    }
+                },
+                {
+                    "name": "12. [Happy Path] GET Xem chi tiết đơn hàng vừa tạo [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Đúng ID đơn hàng vừa tạo', function () {",
+                                "    const expectedId = Number(pm.environment.get('orderId'));",
+                                "    pm.expect(pm.response.json().id).to.eql(expectedId);",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                        "url": {"raw": "{{baseUrl}}/orders/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["orders", "{{orderId}}"]}
+                    }
+                },
+                {
+                    "name": "13. [Lỗi 6/6] PATCH Khách đổi trạng thái sang SHIPPING [State Transition & RBAC]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 403 Forbidden', function () {",
+                                "    pm.response.to.have.status(403);",
+                                "});",
+                                "pm.test('Thông báo khách chỉ được hủy đơn', function () {",
+                                "    pm.expect(pm.response.json().message).to.eql('Bạn chỉ có thể hủy đơn hàng');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "body": {"mode": "raw", "raw": json.dumps({"status": "SHIPPING"}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/orders/{{orderId}}/status", "host": ["{{baseUrl}}"], "path": ["orders", "{{orderId}}", "status"]}
+                    }
+                },
+                {
+                    "name": "14. [Happy Path] PATCH Khách tự hủy đơn hàng Mới (CANCELLED) [ST - YC-52]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Trạng thái đơn hàng chuyển sang CANCELLED', function () {",
+                                "    pm.expect(pm.response.json().status).to.eql('CANCELLED');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "body": {"mode": "raw", "raw": json.dumps({"status": "CANCELLED"}, ensure_ascii=False)},
+                        "url": {"raw": "{{baseUrl}}/orders/{{orderId}}/status", "host": ["{{baseUrl}}"], "path": ["orders", "{{orderId}}", "status"]}
+                    }
+                },
+                {
+                    "name": "15. [Lỗi bổ sung] GET Xem đơn hàng không tồn tại 999999 [Error Guessing]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 404 Not Found', function () {",
+                                "    pm.response.to.have.status(404);",
+                                "});",
+                                "pm.test('Thông báo không tìm thấy đơn', function () {",
+                                "    pm.expect(pm.response.json().message).to.eql('Không tìm thấy đơn hàng');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+                        "url": {"raw": "{{baseUrl}}/orders/999999", "host": ["{{baseUrl}}"], "path": ["orders", "999999"]}
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. System & Health",
+            "item": [
+                {
+                    "name": "16. [Happy Path] GET Kiểm tra tình trạng máy chủ (Health) [EP]",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test('Status code là 200 OK', function () {",
+                                "    pm.response.to.have.status(200);",
+                                "});",
+                                "pm.test('Hệ thống phản hồi status: ok', function () {",
+                                "    pm.expect(pm.response.json().status).to.eql('ok');",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "url": {"raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"]}
+                    }
+                }
+            ]
+        }
+    ]
+}
+
+out_path = r"d:\DuAn\tiem-nha-test\TiemNhaTest_Automated_Suite.postman_collection.json"
+with open(out_path, "w", encoding="utf-8") as f:
+    json.dump(collection, f, ensure_ascii=False, indent=2)
+
+print("SUCCESS: Exported 16 requests to", out_path)

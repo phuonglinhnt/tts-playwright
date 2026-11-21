@@ -1,0 +1,54 @@
+====================================================================
+DANH SÁCH 7 CÂU LỆNH CURL LUỒNG ĐẶT HÀNG (TIỆM NHÀ TEST)
+Base URL: http://localhost:4000/api
+====================================================================
+
+BƯỚC 1: Đăng nhập lấy Token
+--------------------------------------------------------------------
+curl -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "an@test.com", "password": "Matkhau123"}'
+
+
+BƯỚC 2: Xem danh sách sản phẩm xếp theo giá tăng dần
+--------------------------------------------------------------------
+curl -X GET "http://localhost:4000/api/products?sort=price_asc" \
+  -H "Authorization: Bearer <TOKEN>"
+
+
+BƯỚC 3: Thêm sản phẩm (productId: 1, quantity: 2) vào giỏ hàng
+--------------------------------------------------------------------
+curl -X POST http://localhost:4000/api/cart/items \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"productId": 1, "quantity": 2}'
+
+
+BƯỚC 4: Sửa số lượng sản phẩm 1 trong giỏ lên 3
+--------------------------------------------------------------------
+curl -X PATCH http://localhost:4000/api/cart/items/1 \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"quantity": 3}'
+
+
+BƯỚC 5: Đặt hàng từ giỏ hàng hiện tại
+--------------------------------------------------------------------
+curl -X POST http://localhost:4000/api/orders \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"fullname": "Nguyễn Văn An", "phone": "0901234567", "address": "12 Nguyễn Huệ, Quận 1, TP HCM"}'
+
+
+BƯỚC 6: Xem chi tiết đơn hàng theo mã đơn
+--------------------------------------------------------------------
+curl -X GET http://localhost:4000/api/orders/<ORDER_ID> \
+  -H "Authorization: Bearer <TOKEN>"
+
+
+BƯỚC 7: Hủy đơn hàng vừa tạo
+--------------------------------------------------------------------
+curl -X PATCH http://localhost:4000/api/orders/<ORDER_ID>/status \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "CANCELLED"}'
