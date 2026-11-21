@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { RegisterPage } from "../pages/RegisterPage";
-import { LoginPage } from "../pages/LoginPage";
-import { vaildCreateCases, invalidCreateCases } from "../test-data/register";
+import { RegisterPage } from "../../pages/RegisterPage";
+import { LoginPage } from "../../pages/LoginPage";
+import { vaildCreateCases, invalidCreateCases } from "../../test-data/ui/register";
 
 test.describe("Đăng ký", () => {
   let loginPage: LoginPage;

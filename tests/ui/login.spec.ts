@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage";
-import { invalidLoginCases } from "../test-data/users";
+import { LoginPage } from "../../pages/LoginPage";
+import { invalidLoginCases } from "../../test-data/ui/users";
 
 test.describe("Đăng nhập", () => {
   let loginPage: LoginPage;

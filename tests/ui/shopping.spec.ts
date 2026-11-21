@@ -1,12 +1,16 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage";
-import { ProductsPage } from "../pages/ProductsPage";
-import { CartPage } from "../pages/CartPage";
-import { CheckoutPage } from "../pages/CheckoutPage";
-import { invaildCheckoutCases, validCheckoutCases } from "../test-data/inform";
+import { LoginPage } from "../../pages/LoginPage";
+import { ProductsPage } from "../../pages/ProductsPage";
+import { CartPage } from "../../pages/CartPage";
+import { CheckoutPage } from "../../pages/CheckoutPage";
+import {
+  invaildCheckoutCases,
+  validCheckoutCases,
+} from "../../test-data/ui/inform";
+import { login, addProductAndCheckout } from "../../pages/callBack";
 
 test.describe("Mua hàng", () => {
-
+  test.describe.configure({ mode: "serial" });
   let loginPage: LoginPage;
   let productsPage: ProductsPage;
   let cartPage: CartPage;
@@ -23,9 +27,7 @@ test.describe("Mua hàng", () => {
 
     await request.post("/api/test/reset");
 
-    await loginPage.goto();
-    await loginPage.login("an@test.com", "Matkhau123");
-    await expect(page).toHaveURL("/");
+    await login(loginPage, page);
   });
 
   test("Sắp xếp giá từ thấp đến cao, kiểm tra danh sách giá tăng dần", async () => {
@@ -91,17 +93,14 @@ test.describe("Mua hàng", () => {
 
   for (const data of validCheckoutCases) {
     test(`Đi hết luồng thanh toán - ${data.caseName}`, async () => {
-      await productsPage.addFirstProductToCart();
-      await productsPage.goToCart();
-      await expect(cartPage.cartItem).toBeVisible();
-
-      await cartPage.proceedToCheckout();
-      await checkoutPage.fillShippingInfo(
+      await addProductAndCheckout(
+        productsPage,
+        cartPage,
+        checkoutPage,
         data.fullname,
         data.phone,
         data.address,
       );
-      await checkoutPage.submitOrder();
 
       await expect(checkoutPage.orderSuccess).toBeVisible();
     });
@@ -109,17 +108,14 @@ test.describe("Mua hàng", () => {
 
   for (const data of invaildCheckoutCases) {
     test(`Lỗi thanh toán - ${data.caseName}`, async () => {
-      await productsPage.addFirstProductToCart();
-      await productsPage.goToCart();
-      await expect(cartPage.cartItem).toBeVisible();
-
-      await cartPage.proceedToCheckout();
-      await checkoutPage.fillShippingInfo(
+      await addProductAndCheckout(
+        productsPage,
+        cartPage,
+        checkoutPage,
         data.fullname,
         data.phone,
         data.address,
       );
-      await checkoutPage.submitOrder();
 
       countErrorFullname = await checkoutPage.errorFullname.count();
       if (countErrorFullname > 0) {
@@ -144,4 +140,13 @@ test.describe("Mua hàng", () => {
       }
     });
   }
+  test("Tài khoản thành viên được hiển thị giảm giá 5%", async () => {
+    await productsPage.addFirstProductToCart();
+    await productsPage.goToCart();
+
+    await expect(cartPage.memberNote).toBeVisible();
+    await expect(cartPage.memberNote).toContainText("Bạn là thành viên");
+
+    await expect(cartPage.discount).toBeVisible();
+  });
 });
