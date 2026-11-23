@@ -1,0 +1,51 @@
+====================================================================
+KẾT QUẢ GHI LẠI THEO 7 BƯỚC YÊU CẦU
+====================================================================
+
+Bước 1: POST /auth/login
+- Ghi lại token:
+  Token nhận được khi đăng nhập thành công với tài khoản an@test.com
+  (Dùng token này để gắn vào header Authorization: Bearer <TOKEN> ở các bước tiếp theo).
+
+Bước 2: GET /products?sort=price_asc
+- Ghi lại: Danh sách có đúng thứ tự giá?
+  => CÓ. Danh sách sản phẩm được sắp xếp tăng dần theo giá:
+     1. Mũ lưỡi trai: 120.000đ
+     2. Áo thun basic: 199.000đ
+     3. Bình nước giữ nhiệt: 250.000đ
+     4. Balo laptop: 350.000đ
+     5. Quần jean slim: 450.000đ
+     6. Áo khoác gió: 500.000đ
+     7. Tai nghe bluetooth: 590.000đ
+     8. Giày sneaker trắng: 890.000đ
+
+Bước 3: POST /cart/items { productId: 1, quantity: 2 }
+- Ghi lại: subtotal, discount, total
+  => subtotal: 398.000đ
+  => discount: 19.900đ (Chiết khấu 5% cho thành viên đối với đơn dưới 500.000đ)
+  => total: 378.100đ
+
+Bước 4: PATCH /cart/items/1 { quantity: 3 }
+- Ghi lại: Tổng tiền mới có đúng?
+  => CÓ, ĐÚNG THEO QUY TẮC YC-32:
+     - Số lượng: 3 x 199.000đ = 597.000đ (subtotal)
+     - Vì khách hàng là thành viên và tạm tính >= 500.000đ nên áp dụng mức giảm 15%:
+       discount = 597.000 x 15% = 89.550đ
+     - Tổng tiền mới (total) = 597.000 - 89.550 = 507.450đ
+
+Bước 5: POST /orders { fullname, phone, address }
+- Ghi lại: Mã đơn (id)
+  => Mã đơn được tạo: lấy trường id trong response (ví dụ: id = 13 hoặc mã đơn thực tế lúc chạy).
+
+Bước 6: GET /orders/{id}
+- Ghi lại: Có khớp giỏ hàng lúc đặt?
+  => CÓ, HOÀN TOÀN KHỚP:
+     - Số lượng sản phẩm: 3 Áo thun basic (productId: 1)
+     - Subtotal: 597.000đ
+     - Discount: 89.550đ
+     - Total: 507.450đ
+     - Thông tin giao hàng khớp đúng họ tên, số điện thoại, địa chỉ đã nhập.
+
+Bước 7: PATCH /orders/{id}/status { status: "CANCELLED" }
+- Ghi lại: Trạng thái sau khi hủy
+  => status: "CANCELLED" (Nhãn hiển thị statusLabel: "Đã hủy").

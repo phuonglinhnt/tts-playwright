@@ -1,0 +1,28 @@
+{
+  "name": "tiem-nha-test",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website bán hàng mẫu để thực tập sinh luyện kiểm thử",
+  "type": "module",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "start": "vite build && node server/index.js",
+    "dev": "concurrently -k -n api,web -c blue,green \"node --watch server/index.js\" \"vite\"",
+    "build": "vite build",
+    "serve": "node server/index.js",
+    "reset": "node server/reset.js"
+  },
+  "dependencies": {
+    "express": "^4.22.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.5",
+    "vite": "^6.4.4"
+  }
+}
