@@ -1,3 +1,5 @@
+[![Playwright Tests](https://github.com/phuonglinhnt/tts-playwright/actions/workflows/playwright.yml/badge.svg)](https://github.com/phuonglinhnt/tts-playwright/actions/workflows/playwright.yml)
+
 # Dự Án Automation Testing với Playwright - Tiệm Nhà Test
 
 Dự án kiểm thử tự động (End-to-End Testing) cho website thương mại điện tử **Tiệm Nhà Test** sử dụng framework **Playwright** và áp dụng mô hình thiết kế **Page Object Model (POM)**.
