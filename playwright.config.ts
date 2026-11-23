@@ -1,17 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 
-declare const process: any;
-
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
     baseURL: "http://localhost:4000",
     testIdAttribute: "data-test",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
     trace: "on-first-retry",
   },
 
@@ -21,14 +19,12 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  //test 
 
-  // Tự động khởi động website Tiệm Nhà Test khi chạy test
   webServer: {
-    command: "npm run serve",
+    command: "npm ci && npm start",
     cwd: "./tiem-nha-test",
-    url: "http://localhost:4000",
-    reuseExistingServer: true,
+    url: "http://localhost:4000/api/health",
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
 });
