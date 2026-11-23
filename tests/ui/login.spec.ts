@@ -13,7 +13,7 @@ test.describe("Đăng nhập", () => {
   test("Đăng nhập thành công với an@test.com", async ({ page }) => {
     await loginPage.login("an@test.com", "Matkhau123");
 
-    await expect(loginPage.userName).toHaveText("Nguyên Văn An");
+    await expect(loginPage.userName).toHaveText("Nguyễn Văn An");
     await expect(page).toHaveURL("/");
     await expect(loginPage.logout).toBeVisible();
   });
