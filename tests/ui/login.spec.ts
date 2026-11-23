@@ -12,8 +12,8 @@ test.describe("Đăng nhập", () => {
 
   test("Đăng nhập thành công với an@test.com", async ({ page }) => {
     await loginPage.login("an@test.com", "Matkhau123");
-    // Sửa sai tên
-    await expect(loginPage.userName).toHaveText("Lê Thị Bình");
+
+    await expect(loginPage.userName).toHaveText("Nguyên Văn An");
     await expect(page).toHaveURL("/");
     await expect(loginPage.logout).toBeVisible();
   });
