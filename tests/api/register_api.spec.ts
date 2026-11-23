@@ -13,6 +13,9 @@ test.describe("Đăng ký API", () => {
     test(`Đi hết luồng đăng kí thành công - ${data.caseName}`, async ({
       request,
     }) => {
+      if (data.bug) {
+        test.fail(true, data.bug);
+      }
       const res = await request.post("/api/auth/register", {
         data: {
           name: data.name,
@@ -25,11 +28,15 @@ test.describe("Đăng ký API", () => {
       expect(res.status()).toBe(data.expectedStatus);
       const resBody = await res.json();
       expect(resBody).toBeDefined();
+      expect(resBody.user.role).toBe("customer");
     });
   }
 
   for (const data of invalidCreateApiCases) {
     test(`Lỗi đăng ký - ${data.caseName}`, async ({ request }) => {
+      if (data.bug) {
+        test.fail(true, data.bug);
+      }
       const res = await request.post("/api/auth/register", {
         data: {
           name: data.name,
@@ -41,7 +48,10 @@ test.describe("Đăng ký API", () => {
       });
       expect(res.status()).toBe(data.expectedStatus);
       const resBody = await res.json();
-      expect(resBody).toBeDefined();
+      if (data.expectedError) {
+        const allErrors = Object.values(resBody.errors || {}).flat().concat(resBody.message || "");
+        expect(allErrors).toContain(data.expectedError);
+      }
     });
   }
 });

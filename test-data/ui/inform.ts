@@ -20,6 +20,7 @@ export const invaildCheckoutCases = [
     phone: "0123456789",
     address: "Q. HoangMai",
     expectedError: "Vui lòng nhập họ tên người nhận",
+    errorField: "errorFullname"
   },
   {
     caseName: "Bỏ trống SDT",
@@ -27,6 +28,7 @@ export const invaildCheckoutCases = [
     phone: "",
     address: "Q. HoangMai",
     expectedError: "Vui lòng nhập số điện thoại",
+    errorField: "errorPhone"
   },
   {
     caseName: "Bỏ trống địa chỉ",
@@ -34,6 +36,7 @@ export const invaildCheckoutCases = [
     phone: "0123456789",
     address: "",
     expectedError: "Vui lòng nhập địa chỉ giao hàng",
+    errorField: "errorAddress"
   },
   {
     caseName: "Địa chỉ 9 ký tự",
@@ -41,5 +44,6 @@ export const invaildCheckoutCases = [
     phone: "0123456789",
     address: "Hoang Mai",
     expectedError: "Địa chỉ quá ngắn, vui lòng nhập đầy đủ",
+    errorField: "errorAddress"
   },
 ];

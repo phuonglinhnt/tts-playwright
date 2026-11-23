@@ -20,7 +20,7 @@ export class ProductsPage {
   }
 
   async sortBy(option: string) {
-    await this.sortSelect.selectOption("price_asc");
+    await this.sortSelect.selectOption(option);
   }
 
   async getAllPrices(): Promise<number[]> {

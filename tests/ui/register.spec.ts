@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Locator } from "@playwright/test";
 import { RegisterPage } from "../../pages/RegisterPage";
 import { LoginPage } from "../../pages/LoginPage";
 import { vaildCreateCases, invalidCreateCases } from "../../test-data/ui/register";
@@ -6,11 +6,6 @@ import { vaildCreateCases, invalidCreateCases } from "../../test-data/ui/registe
 test.describe("Đăng ký", () => {
   let loginPage: LoginPage;
   let registerPage: RegisterPage;
-  let counterrorName: number;
-  let counterrorEmail: number;
-  let counterrorPassword: number;
-  let counterrorconfirmPassword: number;
-  let counterrorAge: number;
 
   test.beforeEach(async ({ page, request }) => {
     loginPage = new LoginPage(page);
@@ -25,6 +20,9 @@ test.describe("Đăng ký", () => {
     test(`Đi hết luồng đăng kí thành công - ${data.caseName}`, async ({
       page,
     }) => {
+      if (data.bug) {
+        test.fail(true, data.bug);
+      }
       await registerPage.fillInfo(
         data.name,
         data.email,
@@ -42,6 +40,9 @@ test.describe("Đăng ký", () => {
 
   for (const data of invalidCreateCases) {
     test(`Lỗi đăng ký - ${data.caseName}`, async ({ page }) => {
+      if (data.bug) {
+        test.fail(true, data.bug);
+      }
       await registerPage.fillInfo(
         data.name,
         data.email,
@@ -51,36 +52,12 @@ test.describe("Đăng ký", () => {
       );
       await registerPage.registerClick();
 
-      counterrorName = await registerPage.errorName.count();
-      if (counterrorName > 0) {
-        await expect(registerPage.errorName).toBeVisible();
-        await expect(registerPage.errorName).toContainText(data.expectedError);
-      }
-      counterrorEmail = await registerPage.errorEmail.count();
-      if (counterrorEmail > 0) {
-        await expect(registerPage.errorEmail).toBeVisible();
-        await expect(registerPage.errorEmail).toContainText(data.expectedError);
-      }
-      counterrorPassword = await registerPage.errorPassword.count();
-      if (counterrorPassword > 0) {
-        await expect(registerPage.errorPassword).toBeVisible();
-        await expect(registerPage.errorPassword).toContainText(
-          data.expectedError,
-        );
-      }
-      counterrorconfirmPassword =
-        await registerPage.errorConfirmPassword.count();
-      if (counterrorconfirmPassword > 0) {
-        await expect(registerPage.errorConfirmPassword).toBeVisible();
-        await expect(registerPage.errorConfirmPassword).toContainText(
-          data.expectedError,
-        );
-      }
-      counterrorAge = await registerPage.errorAge.count();
-      if (counterrorAge > 0) {
-        await expect(registerPage.errorAge).toBeVisible();
-        await expect(registerPage.errorAge).toContainText(data.expectedError);
-      }
+      const targetError = registerPage[data.errorField as keyof RegisterPage] as Locator;
+
+      await expect(targetError).toBeVisible();
+      await expect(targetError).toContainText(data.expectedError);
+
+
     });
   }
 });

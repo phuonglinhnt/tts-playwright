@@ -2,9 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined, // <--- THÊM DÒNG NÀY ĐỂ TRÁNH XUNG ĐỘT DATABASE TRÊN CI
   reporter: "html",
   use: {
     baseURL: "http://localhost:4000",

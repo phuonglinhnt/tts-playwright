@@ -6,3 +6,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+# Database SQLite (Không commit dữ liệu)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+tiem-nha-test/*.db
+tiem-nha-test/data/*.db

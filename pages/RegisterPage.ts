@@ -36,7 +36,7 @@ export class RegisterPage {
   }
 
   async goto() {
-    await this.page.goto("http://localhost:4000/register");
+    await this.page.goto("/register");
   }
 
   async fillInfo(

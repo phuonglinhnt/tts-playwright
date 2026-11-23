@@ -71,17 +71,17 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(orderDetail.id).toBe(newOrder.id);
   });
 
-  test("TC09 [BUG-64] - Tạo đơn hàng với SĐT không hợp lệ ('123') phải báo lỗi 400", async ({
+  test("TC09 [INTERN-47] - Tạo đơn hàng với SĐT không hợp lệ ('01234567891') phải báo lỗi 400", async ({
     request,
   }) => {
     test.info().annotations.push({
       type: "issue",
       description:
-        "Jira: BUG-64 - API tạo đơn chấp nhận SĐT '123' không đúng định dạng 10 chữ số",
+        "Jira: INTERN-47 - API tạo đơn chấp nhận SĐT '01234567891' không đúng định dạng 10 chữ số",
     });
     test.fail(
       true,
-      "Bug-64: API trả về 201 Created thay vì 400 khi SĐT sai quy định",
+      "INTERN-: API trả về 201 Created thay vì 400 khi SĐT sai quy định",
     );
     const token = await getToken(request);
 
@@ -94,7 +94,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
       headers: { Authorization: `Bearer ${token}` },
       data: {
         fullname: "Nguyen Van An",
-        phone: "123",
+        phone: "01234567891",
         address: "Cau Giay, Ha Noi",
       },
     });
@@ -103,19 +103,19 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(400);
   });
 
-  test("TC10 [BUG-65] - Khách không được phép hủy đơn hàng khi đã DELIVERED", async ({
+  test("TC10 [INTERN-46] - Khách không được phép hủy đơn hàng khi đã DELIVERED", async ({
     request,
   }) => {
     test.info().annotations.push({
       type: "issue",
       description:
-        "Jira: BUG-65 - API trả về 200 OK thay vì 400 khi khách hủy đơn đã giao (DELIVERED)",
+        "Jira: INTERN-46 - API trả về 200 OK thay vì 400 khi khách hủy đơn đã giao (DELIVERED)",
     });
-    test.fail(true, "Bug-65: Backend cho phép hủy đơn khi đã giao hàng");
+    test.fail(true, "INTERN-46: Backend cho phép hủy đơn khi đã giao hàng");
     const token = await getToken(request);
     const order = await createdOrder(request, token, 1, 1);
 
-    const adminToken = getAdminToken(request);
+    const adminToken = await getAdminToken(request);
     await request.patch(`/api/orders/${order.id}/status`, {
       headers: { Authorization: `Bearer ${adminToken}` },
       data: { status: "CONFIRMED" },
@@ -211,17 +211,17 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(user.email).toBe("an@test.com");
   });
 
-  test("TC17 [BUG-66] - Cập nhật số lượng sản phẩm trong giỏ vượt quá 10 (số lượng = 15) phải báo lỗi 400", async ({
+  test("TC17 [INTERN-55] - Cập nhật số lượng sản phẩm trong giỏ vượt quá 10 (số lượng = 11) phải báo lỗi 400", async ({
     request,
   }) => {
     test.info().annotations.push({
       type: "issue",
       description:
-        "Jira: BUG-66 - API PATCH /api/cart/items/:id cho phép mua 15 sản phẩm (vượt tối đa 10)",
+        "Jira: INTERN-55 - API PATCH /api/cart/items/:id cho phép mua 11 sản phẩm (vượt tối đa 10)",
     });
     test.fail(
       true,
-      "Bug-66: API trả về 200 OK thay vì 400 khi cập nhật quantity = 15",
+      "INTERN-55: API trả về 200 OK thay vì 400 khi cập nhật quantity = 11",
     );
     const token = await getToken(request);
 
@@ -232,7 +232,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
 
     const res = await request.patch("/api/cart/items/1", {
       headers: { Authorization: `Bearer ${token}` },
-      data: { quantity: 15 },
+      data: { quantity: 11 },
     });
     // Mong đợi: 400 Bad Request
     // Kết quả trả về: 200 OK

@@ -9,24 +9,44 @@ export const vaildCreateApiCases = [
     expectedStatus: 201,
   },
   {
-    caseName: "Biên dưới hợp lệ",
+    caseName: "Tuổi 18",
     name: "Nguyenvana",
-    email: "chuatontai1@test.com",
-    password: "Mat12345",
-    confirmPassword: "Mat12345",
-    age: 19,
+    email: "chuatontai2@test.com",
+    password: "Matkhau123",
+    confirmPassword: "Matkhau123",
+    age: 18,
+    expectedStatus: 201,
+    bug: "INTERN-27: Backend từ chối tuổi 18"
+  },
+  {
+    caseName: "Tuổi 60",
+    name: "A".repeat(50),
+    email: "chuatontai3@test.com",
+    password: "Matkhau123",
+    confirmPassword: "Matkhau123",
+    age: 60,
     expectedStatus: 201,
   },
   {
-    caseName: "Biên trên hợp lệ",
+    caseName: "Mật khẩu 8 ký tự",
     name: "A".repeat(50),
-    email: "chuatontai2@test.com",
+    email: "chuatontai3@test.com",
+    password: "Mat12345",
+    confirmPassword: "Mat12345",
+    age: 60,
+    expectedStatus: 201,
+  },
+  {
+    caseName: "Mật khẩu 20 ký tự",
+    name: "A".repeat(50),
+    email: "chuatontai3@test.com",
     password: "Matkhau1234567890123",
     confirmPassword: "Matkhau1234567890123",
     age: 60,
     expectedStatus: 201,
   },
 ];
+
 
 export const invalidCreateApiCases = [
   {
@@ -78,6 +98,16 @@ export const invalidCreateApiCases = [
     age: 25,
     expectedStatus: 400,
     expectedError: "Mật khẩu phải dài từ 8 đến 20 ký tự",
+  },
+  {
+    caseName: "Mật khẩu 21 ký tự",
+    name: "Nguyenvana",
+    email: "chuatontai@test.com",
+    password: "Matkhau12345678901234",
+    confirmPassword: "Matkhau12345678901234",
+    age: 25,
+    expectedError: "Mật khẩu phải dài từ 8 đến 20 ký tự",
+    bug: "INTERN-28: Backend vẫn nhận mật khẩu 21 ký tự vượt 20 ký tự"
   },
   {
     caseName: "Mật khẩu thiếu chữ hoa",

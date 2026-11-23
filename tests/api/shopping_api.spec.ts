@@ -25,6 +25,11 @@ test.describe("Mua hàng", () => {
         },
       });
       expect(res.status()).toBe(data.expectedStatus);
+      const resBody = await res.json();
+      expect(resBody.id).toBeTruthy();
+      expect(resBody.status).toBe("NEW");
+      expect(resBody.fullname).toBe(data.fullname);
+
     });
   }
 
@@ -45,7 +50,10 @@ test.describe("Mua hàng", () => {
       });
       expect(res.status()).toBe(data.expectedStatus);
       const resBody = await res.json();
-      expect(resBody).toBeDefined();
+      if (data.expectedMessage) {
+        const errorValues = Object.values(resBody.errors || {});
+        expect(errorValues).toContain(data.expectedMessage);
+      }
     });
   }
 });

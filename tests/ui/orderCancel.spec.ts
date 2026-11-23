@@ -25,6 +25,7 @@ test.describe("Hủy đơn hàng", () => {
     await expect(page).toHaveURL("/");
   });
   test("Người dùng mua hàng rồi tự hủy đơn hàng thành công trên giao diện", async () => {
+    test.fail(true, "INTERN-18: Banner 'Đặt hàng thành công' vẫn còn hiển thị khi đã hủy đơn");
     await productsPage.addFirstProductToCart();
     await productsPage.goToCart();
 
@@ -35,9 +36,11 @@ test.describe("Hủy đơn hàng", () => {
       "Cau Giay, Ha Noi",
     );
     await checkoutPage.submitOrder();
+    await expect(orderPage.orderSuccess).toBeVisible();
 
     await orderPage.cancelOrder();
     await expect(orderPage.cancelledNote).toBeVisible();
     await expect(orderPage.cancelledNote).toHaveText("Đơn hàng này đã bị hủy.");
+    await expect(orderPage.orderSuccess).not.toBeVisible();
   });
 });

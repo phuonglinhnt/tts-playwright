@@ -7,7 +7,7 @@ export async function getToken(request: APIRequestContext): Promise<string> {
       password: "Matkhau123",
     },
   });
-  expect(res).toBeTruthy();
+  expect(res.ok()).toBeTruthy();
   const data = await res.json();
   return data.token;
 }
@@ -21,6 +21,7 @@ export async function getAdminToken(
       password: "Matkhau123",
     },
   });
+  expect(res.ok()).toBeTruthy();
   const data = await res.json();
   return data.token;
 }
@@ -35,7 +36,7 @@ export async function createdOrder(
     headers: { Authorization: `Bearer ${token}` },
     data: { productId: productId, quantity: quantity },
   });
-  
+
   const res = await request.post("/api/orders", {
     headers: { Authorization: `Bearer ${token}` },
     data: {

@@ -6,6 +6,7 @@ export class CartPage {
   readonly emptyCartMessage: Locator;
   readonly checkoutButton: Locator;
   readonly discount: Locator;
+  readonly discountRate: Locator;
   readonly memberNote: Locator;
 
   constructor(private page: Page) {
@@ -14,7 +15,9 @@ export class CartPage {
     this.emptyCartMessage = page.locator('[data-test="empty-cart"]');
     this.checkoutButton = page.locator('[data-test="checkout"]');
     this.discount = page.locator('[data-test="discount"]');
+    this.discountRate = page.getByText('Giảm giá (5%)');
     this.memberNote = page.locator('[data-test="member-note"]');
+
   }
 
   async removeFirstItem() {
