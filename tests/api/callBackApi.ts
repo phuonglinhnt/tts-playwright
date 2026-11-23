@@ -28,7 +28,7 @@ export async function getAdminToken(
 
 export async function createdOrder(
   request: APIRequestContext,
-  token: String,
+  token: string,
   productId: number,
   quantity: number,
 ) {

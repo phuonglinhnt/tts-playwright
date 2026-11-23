@@ -1,20 +1,23 @@
 import { test, expect } from "@playwright/test";
 import {
-  vaildCreateApiCases,
+  validCreateApiCases,
   invalidCreateApiCases,
 } from "../../test-data/api/register_api";
 
-test.describe("Đăng ký API", () => {
+test.describe("API-Đăng ký", () => {
   test.beforeEach(async ({ request }) => {
     await request.post("/api/test/reset");
   });
 
-  for (const data of vaildCreateApiCases) {
+  for (const data of validCreateApiCases) {
     test(`Đi hết luồng đăng kí thành công - ${data.caseName}`, async ({
       request,
     }) => {
       if (data.bug) {
-        test.fail(true, data.bug);
+        test.info().annotations.push({
+          type: "issue",
+          description: data.bug,
+        });
       }
       const res = await request.post("/api/auth/register", {
         data: {
@@ -35,7 +38,10 @@ test.describe("Đăng ký API", () => {
   for (const data of invalidCreateApiCases) {
     test(`Lỗi đăng ký - ${data.caseName}`, async ({ request }) => {
       if (data.bug) {
-        test.fail(true, data.bug);
+        test.info().annotations.push({
+          type: "issue",
+          description: data.bug,
+        });
       }
       const res = await request.post("/api/auth/register", {
         data: {

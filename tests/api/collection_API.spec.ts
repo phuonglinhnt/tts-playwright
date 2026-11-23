@@ -2,25 +2,24 @@ import { test, expect, request } from "@playwright/test";
 import { createdOrder, getAdminToken, getToken } from "./callBackApi";
 
 test.describe("Bộ kiểm thử API theo Collection", () => {
-  test.describe.configure({ mode: "serial" });
   test.beforeEach(async ({ request }) => {
     await request.post("/api/test/reset");
   });
 
-  test("TC01 - Đăng nhập hợp lệ", async ({ request }) => {
+  test("Đăng nhập hợp lệ", async ({ request }) => {
     const token = await getToken(request);
 
     expect(token).toBeTruthy();
   });
 
-  test("TC02 - Đăng nhập sai mật khẩu", async ({ request }) => {
+  test("Đăng nhập sai mật khẩu", async ({ request }) => {
     const res = await request.post("/api/auth/login", {
       data: { email: "an@test.com", password: "Saimatkhau" },
     });
     expect(res.status()).toBe(401);
   });
 
-  test("TC03 - Lấy danh sách sản phẩm", async ({ request }) => {
+  test("Lấy danh sách sản phẩm", async ({ request }) => {
     const token = await getToken(request);
     const res = await request.get("/api/products", {
       headers: { Authorization: `Bearer ${token}` },
@@ -30,7 +29,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(Array.isArray(products)).toBeTruthy();
   });
 
-  test("TC04 - Xem sản phẩm không tồn tại", async ({ request }) => {
+  test("Xem sản phẩm không tồn tại", async ({ request }) => {
     const token = await getToken(request);
     const res = await request.get("/api/products/999", {
       headers: { Authorization: `Bearer ${token}` },
@@ -38,12 +37,12 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(404);
   });
 
-  test("TC05 - Xem giỏ hàng không có token", async ({ request }) => {
+  test("Xem giỏ hàng không có token", async ({ request }) => {
     const res = await request.get("/api/cart");
     expect(res.status()).toBe(401);
   });
 
-  test("TC06 - Thêm sản phẩm vào giỏ hàng", async ({ request }) => {
+  test("Thêm sản phẩm vào giỏ hàng", async ({ request }) => {
     const token = await getToken(request);
     const res = await request.post("/api/cart/items", {
       headers: { Authorization: `Bearer ${token}` },
@@ -52,7 +51,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(201);
   });
 
-  test("TC07 - Tạo đơn hàng thành công", async ({ request }) => {
+  test("Tạo đơn hàng thành công", async ({ request }) => {
     const token = await getToken(request);
     const order = await createdOrder(request, token, 1, 1);
 
@@ -60,7 +59,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(order.status).toBe("NEW");
   });
 
-  test("TC08 - Xem chi tiết đơn hàng vừa tạo", async ({ request }) => {
+  test("Xem chi tiết đơn hàng vừa tạo", async ({ request }) => {
     const token = await getToken(request);
     const newOrder = await createdOrder(request, token, 1, 1);
     const res = await request.get(`/api/orders/${newOrder.id}`, {
@@ -71,7 +70,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(orderDetail.id).toBe(newOrder.id);
   });
 
-  test("TC09 [INTERN-47] - Tạo đơn hàng với SĐT không hợp lệ ('01234567891') phải báo lỗi 400", async ({
+  test("Tạo đơn hàng với SĐT không hợp lệ ('01234567891') phải báo lỗi 400", async ({
     request,
   }) => {
     test.info().annotations.push({
@@ -79,10 +78,6 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
       description:
         "Jira: INTERN-47 - API tạo đơn chấp nhận SĐT '01234567891' không đúng định dạng 10 chữ số",
     });
-    test.fail(
-      true,
-      "INTERN-: API trả về 201 Created thay vì 400 khi SĐT sai quy định",
-    );
     const token = await getToken(request);
 
     await request.post("/api/cart/items", {
@@ -103,7 +98,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(400);
   });
 
-  test("TC10 [INTERN-46] - Khách không được phép hủy đơn hàng khi đã DELIVERED", async ({
+  test("Khách không được phép hủy đơn hàng khi đã DELIVERED", async ({
     request,
   }) => {
     test.info().annotations.push({
@@ -111,7 +106,6 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
       description:
         "Jira: INTERN-46 - API trả về 200 OK thay vì 400 khi khách hủy đơn đã giao (DELIVERED)",
     });
-    test.fail(true, "INTERN-46: Backend cho phép hủy đơn khi đã giao hàng");
     const token = await getToken(request);
     const order = await createdOrder(request, token, 1, 1);
 
@@ -138,7 +132,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(resCancel.status()).toBe(400);
   });
 
-  test("TC11 - Xem giỏ hàng hợp lệ khi có Token", async ({ request }) => {
+  test("Xem giỏ hàng hợp lệ khi có Token", async ({ request }) => {
     const token = await getToken(request);
     const res = await request.get("/api/cart", {
       headers: { Authorization: `Bearer ${token}` },
@@ -148,7 +142,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(cart.items).toBeDefined();
   });
 
-  test("TC12 - Đổi số lượng sản phẩm trong giỏ hàng", async ({ request }) => {
+  test("Đổi số lượng sản phẩm trong giỏ hàng", async ({ request }) => {
     const token = await getToken(request);
 
     await request.post("/api/cart/items", {
@@ -162,7 +156,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(200);
   });
 
-  test("TC13 - Xóa một sản phẩm khỏi giỏ hàng", async ({ request }) => {
+  test("Xóa một sản phẩm khỏi giỏ hàng", async ({ request }) => {
     const token = await getToken(request);
     await request.post("/api/cart/items", {
       headers: { Authorization: `Bearer ${token}` },
@@ -174,7 +168,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(204);
   });
 
-  test("TC14 - Khách tự hủy đơn hàng mới tạo", async ({ request }) => {
+  test("Khách tự hủy đơn hàng mới tạo", async ({ request }) => {
     const token = await getToken(request);
     const order = await createdOrder(request, token, 1, 1);
 
@@ -187,7 +181,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(updatedOrder.status).toBe("CANCELLED");
   });
 
-  test("TC15 - Khách thường không được phép đổi trạng thái sang SHIPPING", async ({
+  test("Khách thường không được phép đổi trạng thái sang SHIPPING", async ({
     request,
   }) => {
     const token = await getToken(request);
@@ -199,7 +193,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(res.status()).toBe(403);
   });
 
-  test("TC16 - Lấy thông tin người dùng đang đăng nhập (Me)", async ({
+  test("Lấy thông tin người dùng đang đăng nhập (Me)", async ({
     request,
   }) => {
     const token = await getToken(request);
@@ -211,7 +205,7 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
     expect(user.email).toBe("an@test.com");
   });
 
-  test("TC17 [INTERN-55] - Cập nhật số lượng sản phẩm trong giỏ vượt quá 10 (số lượng = 11) phải báo lỗi 400", async ({
+  test("Cập nhật số lượng sản phẩm trong giỏ vượt quá 10 (số lượng = 11) phải báo lỗi 400", async ({
     request,
   }) => {
     test.info().annotations.push({
@@ -219,10 +213,6 @@ test.describe("Bộ kiểm thử API theo Collection", () => {
       description:
         "Jira: INTERN-55 - API PATCH /api/cart/items/:id cho phép mua 11 sản phẩm (vượt tối đa 10)",
     });
-    test.fail(
-      true,
-      "INTERN-55: API trả về 200 OK thay vì 400 khi cập nhật quantity = 11",
-    );
     const token = await getToken(request);
 
     await request.post("/api/cart/items", {

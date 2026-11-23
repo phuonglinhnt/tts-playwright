@@ -5,7 +5,7 @@ import {
 } from "../../test-data/api/inform_api";
 import { getToken } from "./callBackApi";
 
-test.describe("Mua hàng", () => {
+test.describe("Mua hàng_API", () => {
   test.beforeEach(async ({ request }) => {
     await request.post("/api/test/reset");
   });

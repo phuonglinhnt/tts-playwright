@@ -1,4 +1,4 @@
-export const validlLoginApiCases = [
+export const validLoginApiCases = [
   {
     caseName: "Thành công",
     email: "an@test.com",

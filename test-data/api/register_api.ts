@@ -1,4 +1,4 @@
-export const vaildCreateApiCases = [
+export const validCreateApiCases = [
   {
     caseName: "Giá trị hợp lệ ",
     name: "Nguyenvana",
@@ -106,6 +106,7 @@ export const invalidCreateApiCases = [
     password: "Matkhau12345678901234",
     confirmPassword: "Matkhau12345678901234",
     age: 25,
+    expectedStatus: 400,
     expectedError: "Mật khẩu phải dài từ 8 đến 20 ký tự",
     bug: "INTERN-28: Backend vẫn nhận mật khẩu 21 ký tự vượt 20 ký tự"
   },
