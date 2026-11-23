@@ -13,7 +13,7 @@ export const validCheckoutCases = [
   },
 ];
 
-export const invaildCheckoutCases = [
+export const invalidCheckoutCases = [
   {
     caseName: "Bỏ trống Họ tên",
     fullname: "",

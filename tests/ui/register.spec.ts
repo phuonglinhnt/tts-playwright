@@ -1,9 +1,9 @@
 import { test, expect, Locator } from "@playwright/test";
 import { RegisterPage } from "../../pages/RegisterPage";
 import { LoginPage } from "../../pages/LoginPage";
-import { vaildCreateCases, invalidCreateCases } from "../../test-data/ui/register";
+import { validCreateCases, invalidCreateCases } from "../../test-data/ui/register";
 
-test.describe("Đăng ký", () => {
+test.describe("UI-Đăng ký", () => {
   let loginPage: LoginPage;
   let registerPage: RegisterPage;
 
@@ -16,12 +16,15 @@ test.describe("Đăng ký", () => {
     await registerPage.goto();
   });
 
-  for (const data of vaildCreateCases) {
+  for (const data of validCreateCases) {
     test(`Đi hết luồng đăng kí thành công - ${data.caseName}`, async ({
       page,
     }) => {
       if (data.bug) {
-        test.fail(true, data.bug);
+        test.info().annotations.push({
+          type: "issue",
+          description: data.bug,
+        });
       }
       await registerPage.fillInfo(
         data.name,
@@ -33,7 +36,7 @@ test.describe("Đăng ký", () => {
 
       await registerPage.registerClick();
 
-      await expect(page).toHaveURL("http://localhost:4000/login");
+      await expect(page).toHaveURL("/login");
       await expect(registerPage.registerSuccess).toBeVisible();
     });
   }
@@ -41,7 +44,10 @@ test.describe("Đăng ký", () => {
   for (const data of invalidCreateCases) {
     test(`Lỗi đăng ký - ${data.caseName}`, async ({ page }) => {
       if (data.bug) {
-        test.fail(true, data.bug);
+        test.info().annotations.push({
+          type: "issue",
+          description: data.bug,
+        });
       }
       await registerPage.fillInfo(
         data.name,

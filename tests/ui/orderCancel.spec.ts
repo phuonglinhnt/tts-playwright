@@ -5,8 +5,8 @@ import { CartPage } from "../../pages/CartPage";
 import { CheckoutPage } from "../../pages/CheckoutPage";
 import { OrderPage } from "../../pages/OrderPage";
 
-test.describe("Hủy đơn hàng", () => {
-  test.describe.configure({ mode: "serial" });
+test.describe("UI-Hủy đơn hàng", () => {
+
   let loginPage: LoginPage;
   let productsPage: ProductsPage;
   let cartPage: CartPage;
@@ -25,7 +25,10 @@ test.describe("Hủy đơn hàng", () => {
     await expect(page).toHaveURL("/");
   });
   test("Người dùng mua hàng rồi tự hủy đơn hàng thành công trên giao diện", async () => {
-    test.fail(true, "INTERN-18: Banner 'Đặt hàng thành công' vẫn còn hiển thị khi đã hủy đơn");
+    test.info().annotations.push({
+      type: "issue",
+      description: "INTERN-18: Banner 'Đặt hàng thành công' vẫn còn hiển thị khi đã hủy đơn",
+    });
     await productsPage.addFirstProductToCart();
     await productsPage.goToCart();
 

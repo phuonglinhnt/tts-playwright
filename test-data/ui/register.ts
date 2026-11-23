@@ -1,4 +1,4 @@
-export const vaildCreateCases = [
+export const validCreateCases = [
   {
     caseName: "Giá trị hợp lệ ",
     name: "Nguyenvana",

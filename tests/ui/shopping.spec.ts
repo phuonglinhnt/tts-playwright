@@ -4,30 +4,29 @@ import { ProductsPage } from "../../pages/ProductsPage";
 import { CartPage } from "../../pages/CartPage";
 import { CheckoutPage } from "../../pages/CheckoutPage";
 import {
-  invaildCheckoutCases,
+  invalidCheckoutCases,
   validCheckoutCases,
 } from "../../test-data/ui/inform";
-import { login, addProductAndCheckout } from "../../pages/callBack";
+import { login, addProductAndCheckout } from "../../helpers/uiHelper";
 
-test.describe("Mua hàng", () => {
-  test.describe.configure({ mode: "serial" });
+test.describe("UI-Mua hàng", () => {
+  // test.describe.configure({ mode: "serial" });
   let loginPage: LoginPage;
   let productsPage: ProductsPage;
   let cartPage: CartPage;
   let checkoutPage: CheckoutPage;
 
   test.beforeEach(async ({ page, request }) => {
+    await request.post("/api/test/reset");
     loginPage = new LoginPage(page);
     productsPage = new ProductsPage(page);
     cartPage = new CartPage(page);
     checkoutPage = new CheckoutPage(page);
 
-    await request.post("/api/test/reset");
-
-    await login(loginPage, page);
+    await login(page);
   });
 
-  test("Sắp xếp giá từ thấp đến cao, kiểm tra danh sách giá tăng dần", async () => {
+  test("Sắp xếp giá từ thấp đến cao, kiểm tra danh sách giá tăng dần", async ({ page }) => {
     await productsPage.sortBy("price_asc");
     await expect
       .poll(async () => {
@@ -89,11 +88,9 @@ test.describe("Mua hàng", () => {
   });
 
   for (const data of validCheckoutCases) {
-    test(`Đi hết luồng thanh toán - ${data.caseName}`, async () => {
+    test(`Đi hết luồng thanh toán - ${data.caseName}`, async ({ page }) => {
       await addProductAndCheckout(
-        productsPage,
-        cartPage,
-        checkoutPage,
+        page,
         data.fullname,
         data.phone,
         data.address,
@@ -103,12 +100,10 @@ test.describe("Mua hàng", () => {
     });
   }
 
-  for (const data of invaildCheckoutCases) {
-    test(`Lỗi thanh toán - ${data.caseName}`, async () => {
+  for (const data of invalidCheckoutCases) {
+    test(`Lỗi thanh toán - ${data.caseName}`, async ({ page }) => {
       await addProductAndCheckout(
-        productsPage,
-        cartPage,
-        checkoutPage,
+        page,
         data.fullname,
         data.phone,
         data.address,
