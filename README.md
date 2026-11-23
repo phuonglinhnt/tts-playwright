@@ -6,25 +6,28 @@ Dự án kiểm thử tự động (End-to-End Testing) cho website thương m�
 
 ## 1. Yêu cầu môi trường (Prerequisites)
 
-* **Node.js**: Phiên bản 18 trở lên (Khuyến nghị bản LTS 20+).
-* **Git**: Đã cài đặt trên máy.
+- **Node.js**: Phiên bản 18 trở lên (Khuyến nghị bản LTS 20+).
+- **Git**: Đã cài đặt trên máy.
 
 ---
 
 ## 2. Hướng dẫn cài đặt (Installation)
 
 ### Bước 1: Clone mã nguồn dự án về máy
+
 ```bash
 git clone https://github.com/phuonglinhnt/tts-playwright.git
 cd tts-playwright
 ```
 
 ### Bước 2: Cài đặt các thư viện phụ thuộc
+
 ```bash
 npm install
 ```
 
 ### Bước 3: Cài đặt trình duyệt cho Playwright (nếu chạy lần đầu)
+
 ```bash
 npx playwright install chromium
 ```
@@ -33,22 +36,22 @@ npx playwright install chromium
 
 ## 3. Khởi động Website kiểm thử (Tiệm Nhà Test)
 
-Dự án đã được cấu hình `webServer` trong `playwright.config.ts` để **tự động khởi động** website Tiệm Nhà Test (nằm ở thư mục `../tiem-nha-test`) mỗi khi chạy test.
+Dự án đã được cấu hình `webServer` trong `playwright.config.ts` để **tự động khởi động** website Tiệm Nhà Test (nằm ở thư mục `./tiem-nha-test`) mỗi khi chạy test.
 
-*(Nếu muốn tự khởi động thủ công: chuyển sang thư mục `tiem-nha-test` và chạy `npm start`, website sẽ chạy ở `http://localhost:4000`).*
+_(Nếu muốn tự khởi động thủ công: chuyển sang thư mục `tiem-nha-test` và chạy `npm start`, website sẽ chạy ở `http://localhost:4000`)._
 
 ---
 
 ## 4. Hướng dẫn chạy kiểm thử (Running Tests)
 
-| Mục đích | Câu lệnh |
-| :--- | :--- |
-| **Chạy toàn bộ test (chế độ ngầm - headless)** | `npx playwright test` |
-| **Chạy hiển thị trình duyệt xem trực tiếp** | `npx playwright test --headed` |
-| **Chạy với giao diện trực quan (UI Mode - Khuyên dùng khi debug)** | `npx playwright test --ui` |
-| **Chạy riêng bài test đăng nhập** | `npx playwright test tests/login.spec.ts` |
-| **Chạy riêng bài test mua hàng** | `npx playwright test tests/shopping.spec.ts` |
-| **Mở báo cáo kết quả kiểm thử (HTML Report)** | `npx playwright show-report` |
+| Mục đích                                                           | Câu lệnh                                     |
+| :----------------------------------------------------------------- | :------------------------------------------- |
+| **Chạy toàn bộ test (chế độ ngầm - headless)**                     | `npx playwright test`                        |
+| **Chạy hiển thị trình duyệt xem trực tiếp**                        | `npx playwright test --headed`               |
+| **Chạy với giao diện trực quan (UI Mode - Khuyên dùng khi debug)** | `npx playwright test --ui`                   |
+| **Chạy riêng bài test đăng nhập**                                  | `npx playwright test tests/login.spec.ts`    |
+| **Chạy riêng bài test mua hàng**                                   | `npx playwright test tests/shopping.spec.ts` |
+| **Mở báo cáo kết quả kiểm thử (HTML Report)**                      | `npx playwright show-report`                 |
 
 ---
 
@@ -75,6 +78,7 @@ tts-playwright/
 ---
 
 ## 6. Các kỹ thuật áp dụng trong dự án
-* **Page Object Model (POM):** Toàn bộ `locator` được đóng gói trong các class `pages/`, không viết trực tiếp locator trong file test.
-* **Data-Driven Testing:** Tự động lặp qua nhiều bộ dữ liệu (`invalidLoginCases` trong `test-data/users.ts`) để kiểm thử validation lỗi.
-* **Auto-retry & expect.poll:** Tránh hoàn toàn việc sử dụng `waitForTimeout`, đảm bảo kiểm thử chạy nhanh và ổn định.
+
+- **Page Object Model (POM):** Toàn bộ `locator` được đóng gói trong các class `pages/`, không viết trực tiếp locator trong file test.
+- **Data-Driven Testing:** Tự động lặp qua nhiều bộ dữ liệu (`invalidLoginCases` trong `test-data/users.ts`) để kiểm thử validation lỗi.
+- **Auto-retry & expect.poll:** Tránh hoàn toàn việc sử dụng `waitForTimeout`, đảm bảo kiểm thử chạy nhanh và ổn định.
